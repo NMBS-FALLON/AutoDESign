@@ -9,5 +9,20 @@
         <Setter Property="Margin" Value="10" />
     </Style>
 
+    <Style TargetType="Separator">
+        <Setter Property="Margin" Value="0" />
+        <Setter Property="Padding" Value="0" />
+    </Style>
+
+    <ControlTemplate x:Key="HorzontalSeperator" TargetType="Separator">
+        <Rectangle HorizontalAlignment="Stretch" Height="1" Margin="0" Stroke="Black" />
+    </ControlTemplate>
+
+    <ControlTemplate x:Key="VerticalSeperator" TargetType="Separator">
+        <Rectangle VerticalAlignment="Stretch" Width="1" Margin="0" Stroke="Black" />
+    </ControlTemplate>
+
+
+
 
 </ResourceDictionary>

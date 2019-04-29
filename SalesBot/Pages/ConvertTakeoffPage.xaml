@@ -13,7 +13,8 @@
 
     <Grid>
         <StackPanel>
-            <Button Name="btnConvertSeiTakeoff" Click="btnConvertSeiTakeoff_Click">Convert SEI Takeoff</Button>           
+            <Button Name="btnConvertSeiTakeoff" Click="btnConvertSeiTakeoff_Click">Convert SEI Takeoff</Button>
+            <Button Name="btnConvertGemTakeoff" Click="btnConvertGemTakeoff_Click">Convert GEM Takeoff</Button>
         </StackPanel>
 
     </Grid>

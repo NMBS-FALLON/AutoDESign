@@ -12,6 +12,10 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using LanguageExt;
+using static LanguageExt.Prelude;
+using OfficeOpenXml;
+using AutoIt;
 
 namespace SalesBot.Pages
 {
@@ -35,14 +39,10 @@ namespace SalesBot.Pages
                     ApplyAdditionalTakeoffInfo: (bool)(ApplyAdditionalTakeoffInfoCb.IsChecked)
                 );
 
-            ApplyModifications(modifications);
+            JediMethods.ApplyModifications(modifications);
 
         }
 
-        public static void ApplyModifications((bool AddSelfWeight, bool SetChordsForInertia, bool ApplyAdditionalTakeoffInfo) modifications)
-        {
-            
-        }
 
     }
 }

@@ -4,6 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Design.SalesTools.Sei;
+using LanguageExt;
+using static LanguageExt.Prelude;
+using System.Windows;
+
 
 namespace SalesBot
 {
@@ -11,15 +15,18 @@ namespace SalesBot
     {
         public static void ConvertSeiTakeoff()
         {
-            var openFile = new Microsoft.Win32.OpenFileDialog();
-            openFile.Filter = "Excel Documents|*.xlsx;*.xlsm";
+            var seiTakeoffFileName = General.GetFileName("Select SEI Takeoff", "Excel Documents|*.xlsx;*.xlsm");
+            match(
+                seiTakeoffFileName,
+                Some: fileName => CreateTakeoff.CreateTakeoff(fileName),
+                None: () => { }
+                );
+            MessageBox.Show("Conversion Complete!");
+        }
 
-            var result = openFile.ShowDialog();
-            if (result == true)
-            {
-                var fileName = openFile.FileName;
-                CreateTakeoff.CreateTakeoff(fileName);
-            }
+        public static void ConvertGemTakeoff()
+        {
+
         }
     }
 }

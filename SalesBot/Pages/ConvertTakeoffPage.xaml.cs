@@ -29,5 +29,10 @@ namespace SalesBot.Pages
         {
             Conversions.ConvertSeiTakeoff();
         }
+
+        private void btnConvertGemTakeoff_Click(object sender, RoutedEventArgs e)
+        {
+            Conversions.ConvertGemTakeoff();
+        }
     }
 }
