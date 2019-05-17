@@ -35,5 +35,6 @@ namespace SalesBot.Pages
         {
             this.MainFrame.Source = new Uri("./SelectModifications.xaml", UriKind.Relative);
         }
+
     }
 }

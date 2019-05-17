@@ -16,6 +16,7 @@ using LanguageExt;
 using static LanguageExt.Prelude;
 using OfficeOpenXml;
 using AutoIt;
+using System.Collections.ObjectModel;
 
 namespace SalesBot.Pages
 {
@@ -39,10 +40,27 @@ namespace SalesBot.Pages
                     ApplyAdditionalTakeoffInfo: (bool)(ApplyAdditionalTakeoffInfoCb.IsChecked)
                 );
 
-            JediMethods.ApplyModifications(modifications);
+            try
+            {
+                JediMethods.ApplyModifications(modifications);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error: " + ex.Message);
+            }
 
         }
 
+        private void btnTest_OnClick(object sender, RoutedEventArgs e)
+        {
+            var fileName = General.GetFileName("Select Excel File", "Excel Documents | *.xlsx; *.xlsm");
+            var package = match(fileName, Some: s => General.GetExcelPackage(s), None: () => null);
+            JediMethods.PrintTables(package);
+        }
 
+        private void btnDrawAllModifications_OnClick(object sender, RoutedEventArgs e)
+        {
+            JediMethods.DrawAllProfiles();
+        }
     }
 }

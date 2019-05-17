@@ -18,11 +18,64 @@ using LanguageExt;
 using static LanguageExt.Prelude;
 using AutoIt;
 using static AutoIt.AutoItX;
+using OfficeOpenXml.Table;
+using System.Linq.Expressions;
 
 namespace SalesBot
 {
     public class JediMethods
     {
+
+        static public void PrintTables(ExcelPackage package)
+        {
+            Predicate<ExcelTable> tableContainsMarkColumn =
+                tbl =>
+                    tbl.Columns
+                    .Where(col => col.Name.ToUpper() == "MARK")
+                    .Any();
+
+            var tables = TryGetTablesWhere(package, tableContainsMarkColumn);
+            tables.Iter(tbl => MessageBox.Show(tbl.Name));
+        }
+
+        static public void PrintTableColumnNames(ExcelPackage package, Func<ExcelTable, bool> predicate)
+        {
+            var tables =
+                package.Workbook.Worksheets.AsEnumerable()
+                .SelectMany(sheet => sheet.Tables);
+            var table =
+                tables
+                .Where(tbl => predicate(tbl))
+                .First();
+            var columnNames =
+                table.Columns.Select(col => col.Name);
+            columnNames.Iter(colName => MessageBox.Show(colName));
+
+        }
+
+        static public IEnumerable<ExcelTable> TryGetTablesWhere(ExcelPackage package, Predicate<ExcelTable> whereFunction)
+        {
+            var tables =
+               package.Workbook.Worksheets
+               .AsEnumerable()
+               .SelectMany(sheet => sheet.Tables.Where(tbl => whereFunction(tbl)));
+            return tables;
+        }
+
+        static public Option<ExcelTable> TryGetTableWhere(ExcelPackage package, Predicate<ExcelTable> whereFunction)
+        {
+            var possibleTable =
+               package.Workbook.Worksheets
+               .AsEnumerable()
+               .SelectMany(sheet => sheet.Tables.Where(tbl => whereFunction(tbl)));
+            var tableOption =
+                Enumerable.Any(possibleTable) ?
+                Some(possibleTable.First()) :
+                Option<ExcelTable>.None;
+            return tableOption;
+        }
+
+
         static public void GoToJoistList()
         {
             AutoItSetOption("WinTitleMatchMode", 2);
@@ -62,49 +115,12 @@ namespace SalesBot
             } while (!isFinalMark);
         }
 
-        static public void AddModifications(ExcelPackage package)
+        static public void AddSelfWeight(double selfWeight, out bool changeHappend)
         {
-            var selfWeightDictionary = GetSelfWeights(package);
-            GoToJoistList();
-            var previousMark = "";
-            var isFinalMark = false;
-            do
-            {
-                Send("{ENTER}");
-                WinWaitActive("Joist Properties");
-                var currentMark = ControlGetText("Joist Properties", "", "TDBEdit20");
-                if (currentMark != previousMark)
-                {
-                    if (selfWeightDictionary.ContainsKey(currentMark))
-                    {
-                        var selfWeight = selfWeightDictionary[currentMark];
-                        AddSelfWeight(selfWeight);
-                    }
-                }
-                else
-                {
-                    isFinalMark = true;
-                    WinClose("Joist Properties");
-                }
-
-                if (WinExists("Joist Properties") == 1)
-                {
-                    ControlClick("Joist Properties", "", "TBitBtn2", "left", 1, 46, 11);
-                }
-
-                WinWaitClose("Joist Properties");
-                Sleep(500);
-                previousMark = currentMark;
-                WinWaitActive("Joist Design");
-                Send("{DOWN}");
-            } while (!isFinalMark);
-
-        }
-
-        static public void AddSelfWeight(double selfWeight)
-        {
+            changeHappend = false;
             if (WinExists("Joist Properties") == 1)
             {
+                changeHappend = true;
                 WinActivate("Joist Properties");
                 ControlClick("Joist Properties", "", "TPageControl1", "left", 1, 154, 13);
                 ControlFocus("Joist Properties", "", "TStringGrid1");
@@ -224,10 +240,12 @@ namespace SalesBot
             return additionalTakeoffInfoDictionary;
         }
 
-        public static void SetDeflection(double tlDeflection, double llDeflection)
+        public static void SetDeflection(double tlDeflection, double llDeflection, out bool changeHappened)
         {
+            changeHappened = false;
             if (WinExists("Joist Properties") == 1)
             {
+                changeHappened = true;
                 WinActivate("Joist Properties");
                 ControlClick("Joist Properties", "", "TPageControl1", "left", 1, 27, 13);
                 Sleep(100);
@@ -235,7 +253,7 @@ namespace SalesBot
                 Sleep(100);
                 ControlSetText("Joist Properties", "", "TDBEdit2", llDeflection.ToString());
                 Sleep(100);
-                WinWaitActive("Joist Properties");                
+                WinWaitActive("Joist Properties");
             }
             else
             {
@@ -243,13 +261,15 @@ namespace SalesBot
             }
         }
 
-        public static void SetWoodnailer(double screwSpacing)
+        public static void SetWoodnailer(double screwSpacing, out bool changeHappened)
         {
+            changeHappened = false;
             if (WinExists("Joist Properties") == 1)
             {
                 WinActivate("Joist Properties");
                 if (screwSpacing != 0.0)
                 {
+                    changeHappened = true;
                     ControlClick("Joist Properties", "", "TPageControl1", "left", 1, 223, 13);
                     Sleep(100);
                     ControlCommand("Joist Properties", "", "TDBCheckBox3", "Check", "");
@@ -268,10 +288,12 @@ namespace SalesBot
             }
         }
 
-        public static void SetErfos(bool hasErfoAtLe, bool hasErfoAtRe)
+        public static void SetErfos(bool hasErfoAtLe, bool hasErfoAtRe, out bool changeHappened)
         {
+            changeHappened = false;
             if (WinExists("Joist Properties") == 1)
             {
+                changeHappened = true;
                 WinActivate("Joist Properties");
                 ControlClick("Joist Properties", "", "TPageControl1", "left", 1, 275, 13);
                 Sleep(200);
@@ -302,12 +324,14 @@ namespace SalesBot
             }
         }
 
-        public static void SetChords(Option<string> topChordSize, Option<string> bottomChordSize)
+        public static void SetChords(Option<string> topChordSize, Option<string> bottomChordSize, out bool changeHappened)
         {
+            changeHappened = false;
             if (WinExists("Joist Properties") == 1)
             {
                 if (topChordSize.IsSome || bottomChordSize.IsSome)
                 {
+                    changeHappened = true;
                     WinActivate("Joist Properties");
                     ControlClick("Joist Properties", "", "TPageControl1", "left", 1, 223, 13);
                     if (topChordSize.IsSome)
@@ -379,6 +403,9 @@ namespace SalesBot
                     var currentMark = ControlGetText("Joist Properties", "", "TDBEdit20");
                     if (currentMark != previousMark)
                     {
+                        bool requiresSelfWeight, requiresChordsForInertia, requiresDeflectionSet, requiresErfos, requiresWoodNailerSet;
+                        requiresSelfWeight = requiresChordsForInertia = requiresDeflectionSet = requiresErfos = requiresWoodNailerSet = false;
+
                         if (modifications.AddSelfWeight)
                         {
                             var selfWeightDict = GetSelfWeights(coordinatorToolsPackage);
@@ -387,7 +414,7 @@ namespace SalesBot
                                 var selfWeight = selfWeightDict[currentMark];
                                 if (selfWeight != 0.0)
                                 {
-                                    AddSelfWeight(selfWeight);
+                                    AddSelfWeight(selfWeight, out requiresSelfWeight);
                                 }
                             }
                         }
@@ -397,7 +424,7 @@ namespace SalesBot
                             if (inertiaDict.ContainsKey(currentMark))
                             {
                                 var inertiaInfo = inertiaDict[currentMark];
-                                var tc = 
+                                var tc =
                                     inertiaInfo.TopChordChanged ?
                                     Some(inertiaInfo.TopChordSize) :
                                     Option<string>.None;
@@ -405,22 +432,35 @@ namespace SalesBot
                                     inertiaInfo.BottomChordChanged ?
                                     Some(inertiaInfo.BottomChordSize) :
                                     Option<string>.None;
-                                SetChords(tc, bc);
+                                SetChords(tc, bc, out requiresChordsForInertia);
                             }
                         }
                         if (modifications.ApplyAdditionalTakeoffInfo)
                         {
                             var modificationInfo = GetAdditionalTakeoffInfo(takeoffPackge);
-                            if (modificationInfo.ContainsKey(currentMark))
+                            var currentMarkWithoutLetters =
+                                new string(
+                                    currentMark
+                                    .Where(c => (char.IsDigit(c)))
+                                    .ToArray());
+                            if (modificationInfo.ContainsKey(currentMarkWithoutLetters))
                             {
-                                var addTakeoffInfo = modificationInfo[currentMark];
-                                SetDeflection(addTakeoffInfo.TlDeflection, addTakeoffInfo.LlDeflection);
-                                match(addTakeoffInfo.WnSpacing, Some: space => SetWoodnailer(space), None: () => { });
-                                SetErfos(addTakeoffInfo.ErfoAtLe, addTakeoffInfo.ErfoAtRe);
+                                var addTakeoffInfo = modificationInfo[currentMarkWithoutLetters];
+                                SetDeflection(addTakeoffInfo.TlDeflection, addTakeoffInfo.LlDeflection, out requiresDeflectionSet);
+                                match(addTakeoffInfo.WnSpacing, Some: space => { SetWoodnailer(space, out requiresDeflectionSet); }, None: () => { });
+                                SetErfos(addTakeoffInfo.ErfoAtLe, addTakeoffInfo.ErfoAtRe, out requiresErfos);
                             }
                         }
                         WinWaitActive("Joist Properties");
-                        ControlClick("Joist Properties", "", "TBitBtn2", "left", 1, 46, 11);
+                        var requiresModification = requiresSelfWeight || requiresChordsForInertia || requiresDeflectionSet || requiresErfos || requiresWoodNailerSet;
+                        if (requiresModification)
+                        {
+                            ControlClick("Joist Properties", "", "TBitBtn2", "left", 1, 46, 11);
+                        }
+                        else
+                        {
+                            WinClose("Joist Properties", "");
+                        }
                         WinWaitClose("Joist Properties");
                         Sleep(500);
                     }
@@ -438,6 +478,51 @@ namespace SalesBot
             MessageBox.Show("Modifications Complete!");
 
         }
+
+
+        public static void DrawAllProfiles()
+        {
+            AutoItSetOption("WinTitleMatchMode", 2);
+            GoToJoistList();
+            var previousMark = "";
+            var isFinalMark = false;
+            do
+            {
+                Send("{ENTER}");
+                WinWaitActive("Joist Properties");
+                var currentMark = ControlGetText("Joist Properties", "", "TDBEdit20");
+                if (currentMark != previousMark)
+                {
+                    WinClose("Joist Properties", "");
+                    WinWaitActive("Joist Design");
+                    ControlClick("Joist Design", "", "TToolBar1", "left", 1, 175, 10);
+                    Sleep(400);
+                    var position = WinGetPos("Joist Design", "");
+                    MouseClick("LEFT", position.Location.X + 181, position.Location.Y + 31);
+                    Sleep(200);
+                    MouseClick("LEFT", position.Location.X + 250, position.Location.Y + 300);
+                    Sleep(200);
+                    WinWaitActive("Joist Design", "OK");
+                    Sleep(100);
+                    WinWaitActive("Joist Design");
+                    ControlClick("Joist Design", "", "TToolBar1", "left", 1, 175, 10);
+                    ControlFocus("Joist Design", "", "TDBGridExt1");
+                }
+                else
+                {
+                    isFinalMark = true;
+                    WinClose("Joist Properties");
+                }
+                previousMark = currentMark;
+                WinWaitActive("Joist Design");
+                Send("{DOWN}");
+            } while (!isFinalMark);
+
+
+            MessageBox.Show("Modifications Complete!");
+
+        }
+
 
     }
 }

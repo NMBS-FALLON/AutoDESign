@@ -5,26 +5,29 @@
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
       xmlns:local="clr-namespace:SalesBot.Pages"
       mc:Ignorable="d" 
-      d:DesignHeight="450" d:DesignWidth="800"
+      d:DesignHeight="450"
       Title="SelectModifications"
-      Width="263"
+      Width="330.782"
       Height="275"
       WindowTitle="Select Modifications"
       >
 
-    <Grid VerticalAlignment="Top">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="*" />
-            <RowDefinition Height="*" />
-            <RowDefinition Height="*" />
-        </Grid.RowDefinitions>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="1*" />
-        </Grid.ColumnDefinitions>
+    <DockPanel VerticalAlignment="Top">
 
-        <Label Grid.Row="0" Grid.Column="0" FontFamily="Corbel" FontSize="16" FontWeight="Bold" HorizontalAlignment="Left" Margin="20,10,20,10" >Select Modifications:</Label>
+        <DockPanel.Resources>
+            <DataTemplate x:Key="WorkbookInfoTemplate">
+                <StackPanel Orientation="Horizontal">
+                    <ComboBox SelectedItem="{Binding ContainingWorkbookName}" />
+                    <ComboBox SelectedItem="{Binding ContainingTableName}" />
+                    <ComboBox SelectedItem="{Binding ColumnName}" />
+                </StackPanel>
+            </DataTemplate>
+        </DockPanel.Resources>
 
-        <ListBox x:Name="modificationList" Grid.Row="1" Grid.Column="0" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="20,10,20,10">
+
+        <Label DockPanel.Dock="Top" FontFamily="Corbel" FontSize="16" FontWeight="Bold" HorizontalAlignment="Left" Margin="20,10,20,10" >Select Modifications:</Label>
+
+        <ListBox x:Name="modificationList" DockPanel.Dock="Top" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="20,10,20,10">
             <ListBoxItem>
                 <StackPanel Orientation="Horizontal">
                     <CheckBox Name="AddSelfWeightCb"></CheckBox>
@@ -45,7 +48,8 @@
             </ListBoxItem>
             <ListBoxItem></ListBoxItem>
         </ListBox>
-
-        <Button Name="btnApplyModifications" Grid.Row="2" Grid.Column="0" Click="btnApplyModifications_OnClick" ClickMode="Press" Margin="20,10,20,10" >Apply Modifications</Button>
-    </Grid>
+        
+        <Button Name="btnApplyModifications" DockPanel.Dock="Bottom" Click="btnApplyModifications_OnClick" ClickMode="Press" Margin="20,10,20,10" >Apply Modifications</Button>
+        <Button Name="btnDrawAllProfiles" DockPanel.Dock="Bottom" Click="btnDrawAllModifications_OnClick" ClickMode="Press" Margin="20,10,20,10" >Draw All Calculations</Button>
+    </DockPanel>
 </Page>
