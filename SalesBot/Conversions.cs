@@ -14,13 +14,28 @@ namespace SalesBot
     {
         public static void ConvertSeiTakeoff()
         {
-            var seiTakeoffFileName = General.GetFileName("Select SEI Takeoff", "Excel Documents|*.xlsx;*.xlsm");
+            var seiTakeoffFileName = General.GetFileName("Select SEI Takeoff", "Excel Documents|*.xlsx;*.xlsm;*.xls");
             match(
                 seiTakeoffFileName,
                 Some: fileName =>
                     {
-                        Design.SalesTools.Sei.CreateTakeoff.CreateTakeoff(fileName);
-                        MessageBox.Show("Conversion Complete!");
+                        try
+                        {
+                            if (System.IO.Path.GetExtension(fileName) == ".xls")
+                            {
+                                Design.SalesTools.Gem.CreateTakeoff.CreateTakeoff(fileName);
+                            }
+                            else
+                            {
+                                Design.SalesTools.Sei.CreateTakeoff.CreateTakeoff(fileName);
+                            }
+                            MessageBox.Show("Conversion Complete!");
+                        }
+                        catch (Exception e)
+                        {
+                            MessageBox.Show("Conversion Failed: " + e.Message);
+                        }
+
                     },
                 None: () => { }
                 );
@@ -34,8 +49,16 @@ namespace SalesBot
                 gemTakeoffFileName,
                 Some: fileName =>
                 {
-                    Design.SalesTools.Gem.CreateTakeoff.CreateTakeoff(fileName);
-                    MessageBox.Show("Conversion Complete!");
+                    try
+                    {
+                        Design.SalesTools.Gem.CreateTakeoff.CreateTakeoff(fileName);
+                        MessageBox.Show("Conversion Complete!");
+                    }
+                    catch (Exception e)
+                    {
+                        MessageBox.Show("Conversion Failed: " + e.Message);
+                    }
+
                 },
                 None: () => { }
                 );

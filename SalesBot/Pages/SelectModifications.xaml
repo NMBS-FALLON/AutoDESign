@@ -50,6 +50,6 @@
         </ListBox>
         
         <Button Name="btnApplyModifications" DockPanel.Dock="Bottom" Click="btnApplyModifications_OnClick" ClickMode="Press" Margin="20,10,20,10" >Apply Modifications</Button>
-        <Button Name="btnDrawAllProfiles" DockPanel.Dock="Bottom" Click="btnDrawAllModifications_OnClick" ClickMode="Press" Margin="20,10,20,10" >Draw All Calculations</Button>
+
     </DockPanel>
 </Page>

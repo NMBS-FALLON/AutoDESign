@@ -333,7 +333,7 @@ namespace SalesBot
                 {
                     changeHappened = true;
                     WinActivate("Joist Properties");
-                    ControlClick("Joist Properties", "", "TPageControl1", "left", 1, 223, 13);
+                    ControlClick("Joist Properties", "", "TPageControl1", "left", 1, 241, 10);
                     if (topChordSize.IsSome)
                     {
                         Sleep(100);
@@ -478,51 +478,6 @@ namespace SalesBot
             MessageBox.Show("Modifications Complete!");
 
         }
-
-
-        public static void DrawAllProfiles()
-        {
-            AutoItSetOption("WinTitleMatchMode", 2);
-            GoToJoistList();
-            var previousMark = "";
-            var isFinalMark = false;
-            do
-            {
-                Send("{ENTER}");
-                WinWaitActive("Joist Properties");
-                var currentMark = ControlGetText("Joist Properties", "", "TDBEdit20");
-                if (currentMark != previousMark)
-                {
-                    WinClose("Joist Properties", "");
-                    WinWaitActive("Joist Design");
-                    ControlClick("Joist Design", "", "TToolBar1", "left", 1, 175, 10);
-                    Sleep(400);
-                    var position = WinGetPos("Joist Design", "");
-                    MouseClick("LEFT", position.Location.X + 181, position.Location.Y + 31);
-                    Sleep(200);
-                    MouseClick("LEFT", position.Location.X + 250, position.Location.Y + 300);
-                    Sleep(200);
-                    WinWaitActive("Joist Design", "OK");
-                    Sleep(100);
-                    WinWaitActive("Joist Design");
-                    ControlClick("Joist Design", "", "TToolBar1", "left", 1, 175, 10);
-                    ControlFocus("Joist Design", "", "TDBGridExt1");
-                }
-                else
-                {
-                    isFinalMark = true;
-                    WinClose("Joist Properties");
-                }
-                previousMark = currentMark;
-                WinWaitActive("Joist Design");
-                Send("{DOWN}");
-            } while (!isFinalMark);
-
-
-            MessageBox.Show("Modifications Complete!");
-
-        }
-
 
     }
 }

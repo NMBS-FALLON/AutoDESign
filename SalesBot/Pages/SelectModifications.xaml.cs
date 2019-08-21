@@ -58,9 +58,5 @@ namespace SalesBot.Pages
             JediMethods.PrintTables(package);
         }
 
-        private void btnDrawAllModifications_OnClick(object sender, RoutedEventArgs e)
-        {
-            JediMethods.DrawAllProfiles();
-        }
     }
 }

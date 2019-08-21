@@ -32,7 +32,7 @@
     <ProductName>Sales Bot</ProductName>
     <PublisherName>DESign</PublisherName>
     <SuiteName>Sales Bot</SuiteName>
-    <ApplicationRevision>7</ApplicationRevision>
+    <ApplicationRevision>11</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <PublishWizardCompleted>true</PublishWizardCompleted>
@@ -88,8 +88,9 @@
     <Reference Include="LanguageExt.Core, Version=3.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\LanguageExt.Core.3.1.19\lib\net45\LanguageExt.Core.dll</HintPath>
     </Reference>
-    <Reference Include="sales-tools-library">
-      <HintPath>..\..\sales-tools\src\bin\Release\netstandard2.0\publish\sales-tools-library.dll</HintPath>
+    <Reference Include="sales-tools-library, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\sales-tools\src\bin\Release\netstandard2.0\sales-tools-library.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.configuration" />
